@@ -1,25 +1,40 @@
 
+import Model.Answer;
+import Model.Question;
+import Model.QuestionAnswer;
+import Model.Result;
+import java.awt.List;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Nishan Dhungana
  */
 public class MultipleChoiseQuestion extends javax.swing.JApplet {
 
+    private int count = 0;
+    private int questionId = 0;
+    private String[] ans = new String[4];
+    private int[] ansId = new int[4];
+    private ArrayList<QuestionAnswer> qa = new ArrayList<>();
+    private int answerId = 0;
+
     /**
      * Initializes the applet MultipleChoiseQuestion
      */
     @Override
     public void init() {
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -48,6 +63,20 @@ public class MultipleChoiseQuestion extends javax.swing.JApplet {
             java.awt.EventQueue.invokeAndWait(new Runnable() {
                 public void run() {
                     initComponents();
+                    Action();
+                    
+                    HistoryController hs = new HistoryController();
+                    ArrayList<Integer> al = hs.getSets();
+                    
+                    DefaultListModel listModel1 = new DefaultListModel();
+                    
+                    int i = 0;
+                    for (int a : al) {
+                        listModel1.add(0, "Set " + a);
+                        i++;
+                    }
+                    
+                    jList1.setModel(listModel1);
                 }
             });
         } catch (Exception ex) {
@@ -65,35 +94,59 @@ public class MultipleChoiseQuestion extends javax.swing.JApplet {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lblQuestion = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
+        lblAnsOne = new javax.swing.JRadioButton();
+        lblAnsTwo = new javax.swing.JRadioButton();
+        lblAnsThree = new javax.swing.JRadioButton();
+        lblAnsFour = new javax.swing.JRadioButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
+        jLabel1 = new javax.swing.JLabel();
 
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel1.setText("What is the height of Mt. Everest?");
+        lblQuestion.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        lblQuestion.setText("What is the height of Mt. Everest?");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Question 1");
 
-        jRadioButton1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jRadioButton1.setText("jRadioButton1");
+        lblAnsOne.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        lblAnsOne.setText("jRadioButton1");
+        lblAnsOne.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblAnsOneActionPerformed(evt);
+            }
+        });
 
-        jRadioButton2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jRadioButton2.setText("jRadioButton2");
+        lblAnsTwo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        lblAnsTwo.setText("jRadioButton2");
+        lblAnsTwo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblAnsTwoActionPerformed(evt);
+            }
+        });
 
-        jRadioButton3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jRadioButton3.setText("jRadioButton3");
+        lblAnsThree.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        lblAnsThree.setText("jRadioButton3");
+        lblAnsThree.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblAnsThreeActionPerformed(evt);
+            }
+        });
 
-        jRadioButton4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jRadioButton4.setText("jRadioButton4");
+        lblAnsFour.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        lblAnsFour.setText("jRadioButton4");
+        lblAnsFour.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblAnsFourActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Next");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -116,18 +169,21 @@ public class MultipleChoiseQuestion extends javax.swing.JApplet {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblQuestion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(114, 114, 114))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButton1)
-                            .addComponent(jRadioButton3))
+                            .addComponent(lblAnsOne)
+                            .addComponent(lblAnsThree))
                         .addGap(140, 140, 140)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButton4)
-                            .addComponent(jRadioButton2))
-                        .addGap(188, 426, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addComponent(lblAnsFour)
+                            .addComponent(lblAnsTwo))
+                        .addContainerGap(196, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(98, 98, 98)
                 .addComponent(jButton1)
@@ -141,50 +197,209 @@ public class MultipleChoiseQuestion extends javax.swing.JApplet {
                 .addContainerGap()
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(58, 58, 58)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
-                    .addComponent(jRadioButton2))
+                .addComponent(lblQuestion, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(59, 59, 59)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton3)
-                    .addComponent(jRadioButton4))
+                    .addComponent(lblAnsOne)
+                    .addComponent(lblAnsTwo))
+                .addGap(59, 59, 59)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblAnsThree)
+                    .addComponent(lblAnsFour))
                 .addGap(85, 85, 85)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2))
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 860, 490));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 490));
+
+        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jList1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jList1MouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jList1);
+
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("User History");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(21, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 0, 220, 490));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            // TODO add your handling code here:
-            QuestionController qc = new QuestionController();
-            String question = qc.getQuestions().getQuestion();
-            System.out.println(question);
-        } catch (SQLException ex) {
-            Logger.getLogger(MultipleChoiseQuestion.class.getName()).log(Level.SEVERE, null, ex);
+        if (!lblAnsOne.isSelected()
+                && !lblAnsTwo.isSelected()
+                && !lblAnsThree.isSelected()
+                && !lblAnsFour.isSelected()) {
+
+            JOptionPane.showMessageDialog(this, "Please click one of the correct answer.");
+
+        } else {
+            Action();
+            
+            QuestionAnswer questionAnswer = new QuestionAnswer();
+            questionAnswer.setQuestionId(questionId);
+            questionAnswer.setAnswerId(answerId);
+            qa.add(questionAnswer);
         }
+
+        lblAnsOne.setSelected(false);
+        lblAnsTwo.setSelected(false);
+        lblAnsThree.setSelected(false);
+        lblAnsFour.setSelected(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            HistoryController his = new HistoryController();
+            his.insertIntoHistory(qa);
+            
+            JOptionPane.showMessageDialog(this, "Thank you for playing. Please restart for history");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+//            System.out.println(ex);
+        } finally {
+            lblAnsOne.setSelected(false);
+            lblAnsTwo.setSelected(false);
+            lblAnsThree.setSelected(false);
+            lblAnsFour.setSelected(false);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void lblAnsOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblAnsOneActionPerformed
+        answerId = ansId[0];
+
+        lblAnsTwo.setSelected(false);
+        lblAnsThree.setSelected(false);
+        lblAnsFour.setSelected(false);
+    }//GEN-LAST:event_lblAnsOneActionPerformed
+
+    private void lblAnsTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblAnsTwoActionPerformed
+        answerId = ansId[1];
+
+        lblAnsOne.setSelected(false);
+        lblAnsThree.setSelected(false);
+        lblAnsFour.setSelected(false);
+    }//GEN-LAST:event_lblAnsTwoActionPerformed
+
+    private void lblAnsThreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblAnsThreeActionPerformed
+        answerId = ansId[2];
+
+        lblAnsOne.setSelected(false);
+        lblAnsTwo.setSelected(false);
+        lblAnsFour.setSelected(false);
+    }//GEN-LAST:event_lblAnsThreeActionPerformed
+
+    private void lblAnsFourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblAnsFourActionPerformed
+        answerId = ansId[3];
+
+        lblAnsOne.setSelected(false);
+        lblAnsTwo.setSelected(false);
+        lblAnsThree.setSelected(false);
+    }//GEN-LAST:event_lblAnsFourActionPerformed
+
+    private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
+        // TODO add your handling code here:
+        String a = jList1.getSelectedValue();
+        String[] parts = a.split(" ");
+        int id = Integer.parseInt(parts[1]);
+        
+        HistoryController hc = new HistoryController();
+        try {
+            ArrayList<Result> res = hc.getHistBySet(id);
+            String s = null;
+            for(Result result : res) {
+                s += result.getQuestion() + "\n Your Answer : " 
+                        + result.getAnswerByUser() + "\n"
+                        + "Correct Answer : " + result.getCorrectAnswer() + "\n"
+                        + "Result: " + result.getStatus() + "\n"
+                        + "............................................\n";
+            }
+            
+            JOptionPane.showMessageDialog(this, s);
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(MultipleChoiseQuestion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jList1MouseClicked
+
+    private void Action() {
+        count++;
+        jLabel2.setText("Question " + count);
+        try {
+            QuestionController qc = new QuestionController();
+            int totalQuestion = qc.getTotalQuestion();
+
+            if (totalQuestion != count) {
+                Question question = qc.getQuestion(count);
+                questionId = question.getId() - 1;
+                System.out.println("Question" + questionId);
+
+                int temp = 0;
+                for (Answer answer : question.getAnswer()) {
+                    if (temp == 4) {
+                        break;
+                    }
+                    ans[temp] = answer.getAnswer();
+                    ansId[temp] = answer.getId();
+                    temp++;
+                }
+
+                lblQuestion.setText(question.getQuestion());
+                lblAnsOne.setText(ans[0]);
+                lblAnsTwo.setText(ans[1]);
+                lblAnsThree.setText(ans[2]);
+                lblAnsFour.setText(ans[3]);
+            } else {
+
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MultipleChoiseQuestion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JRadioButton lblAnsFour;
+    private javax.swing.JRadioButton lblAnsOne;
+    private javax.swing.JRadioButton lblAnsThree;
+    private javax.swing.JRadioButton lblAnsTwo;
+    private javax.swing.JLabel lblQuestion;
     // End of variables declaration//GEN-END:variables
 }
